@@ -57,4 +57,69 @@ class OrderTest {
         //when & then
         assertThrows<OrderValidationException> { Order.initiate(orderAmount, merchantId) }
     }
+
+
+    @Test
+    fun shouldFailShipmentNotificationWhenNegativeShippedAmount() {
+        //given
+        val order = Order.initiate(BigDecimal.TEN, UUID.randomUUID())
+        val shipped = BigDecimal.valueOf(-3.2)
+
+        //when & then
+        assertThrows<OrderShipmentException> { order.notifyShipment(shipped) }
+    }
+
+    @Test
+    fun shouldFailShipmentNotificationWhenZeroShippedAmount() {
+        //given
+        val order = Order.initiate(BigDecimal.TEN, UUID.randomUUID())
+        val shipped = BigDecimal.ZERO
+
+        //when & then
+        assertThrows<OrderShipmentException> { order.notifyShipment(shipped) }
+    }
+
+    @Test
+    fun shouldChangeStatusWhenWhenPartialShipmentNotification(){
+        //given
+        val order = Order.initiate(BigDecimal.TEN, UUID.randomUUID())
+        val shipped = BigDecimal.valueOf(2.2)
+
+        //when
+        order.notifyShipment(shipped)
+
+        //then
+        assertThat(order).isNotNull()
+        assertThat(order.orderAmount).isEqualTo(BigDecimal.TEN)
+        assertThat(order.shippedAmount).isEqualTo(shipped)
+        assertThat(order.orderStatus).isEqualTo(Order.OrderStatus.SHIPPED_PARTIALLY)
+    }
+
+    @Test
+    fun shouldChangeStatusToShippedWhenWhenTwoPartialShipmentNotificationsMatchTotalAmount(){
+        //given
+        val order = Order.initiate(BigDecimal.TEN, UUID.randomUUID())
+        val shipped1 = BigDecimal.valueOf(2.2)
+        val shipped2 = BigDecimal.valueOf(7.8)
+
+        //when
+        order.notifyShipment(shipped1)
+        order.notifyShipment(shipped2)
+
+        //then
+        assertThat(order.orderAmount).isEqualTo(BigDecimal.TEN)
+        assertThat(order.shippedAmount).isEqualTo(BigDecimal.TEN)
+        assertThat(order.orderStatus).isEqualTo(Order.OrderStatus.SHIPPED)
+    }
+
+    @Test
+    fun shouldFailShipmentNotificationWhenShippedAmountExceedsOrderAmount() {
+        //given
+        val order = Order.initiate(BigDecimal.TEN, UUID.randomUUID())
+        val shipped = BigDecimal.valueOf(10.1)
+
+        //when & then
+        assertThrows<OrderShipmentException> { order.notifyShipment(shipped) }
+    }
+
 }

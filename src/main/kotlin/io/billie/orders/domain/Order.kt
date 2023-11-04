@@ -19,6 +19,9 @@ class Order(
 
     companion object {
         fun initiate(orderAmount: BigDecimal, merchantId: UUID): Order {
+
+            if (orderAmount <= BigDecimal.ZERO) throw OrderValidationException("Order amount must be greater than zero")
+
             return Order(
                     id = UUID.randomUUID(),
                     version = 1L,
