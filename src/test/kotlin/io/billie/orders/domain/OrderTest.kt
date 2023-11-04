@@ -107,8 +107,8 @@ class OrderTest {
         order.notifyShipment(shipped2)
 
         //then
-        assertThat(order.orderAmount).isEqualTo(BigDecimal.TEN)
-        assertThat(order.shippedAmount).isEqualTo(BigDecimal.TEN)
+        assertThat(order.orderAmount.compareTo(BigDecimal.TEN)).isEqualTo(0)
+        assertThat(order.shippedAmount.compareTo(BigDecimal.TEN)).isEqualTo(0)
         assertThat(order.orderStatus).isEqualTo(Order.OrderStatus.SHIPPED)
     }
 
@@ -120,6 +120,18 @@ class OrderTest {
 
         //when & then
         assertThrows<OrderShipmentException> { order.notifyShipment(shipped) }
+    }
+
+    @Test
+    fun shouldFailShipmentNotificationWhenSecondShippedAmountExceedsOrderAmount() {
+        //given
+        val order = Order.initiate(BigDecimal.TEN, UUID.randomUUID())
+        val shipped1 = BigDecimal.valueOf(1.1)
+        val shipped2 = BigDecimal.valueOf(9.1)
+
+        //when & then
+        order.notifyShipment(shipped1)
+        assertThrows<OrderShipmentException> { order.notifyShipment(shipped2) }
     }
 
 }
