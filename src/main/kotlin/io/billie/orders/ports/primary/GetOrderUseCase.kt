@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class GetOrderUseCase(val orderRepository: OrderRepository) {
+class GetOrderUseCase(private val orderRepository: OrderRepository) {
 
     data class Input(val orderId: UUID)
 
