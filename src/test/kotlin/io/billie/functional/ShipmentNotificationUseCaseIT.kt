@@ -21,7 +21,7 @@ import java.util.*
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = DEFINED_PORT)
-class NotifyShipmentOfOrderIT {
+class ShipmentNotificationUseCaseIT {
 
     @LocalServerPort
     private val port = 8080
@@ -31,9 +31,6 @@ class NotifyShipmentOfOrderIT {
 
     @Autowired
     private lateinit var mapper: ObjectMapper
-
-    @Autowired
-    private lateinit var orderRepository: JpaOrderRepository
 
     val merchantId = UUID.randomUUID()
     val orderTotalAmount = BigDecimal.valueOf(123)

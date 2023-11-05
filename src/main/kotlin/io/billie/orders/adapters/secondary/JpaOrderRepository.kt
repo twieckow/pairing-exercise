@@ -19,7 +19,7 @@ import javax.persistence.Version
 class JpaOrderRepository(private val jpaRepo: JpaOrderRepo) : OrderRepository {
 
     @Transactional(readOnly = true)
-    override fun find(id: UUID): Optional<Order> = jpaRepo.findById(id).map(OrderDbModel::toDomainModel)
+    override fun find(id: UUID): Order? = jpaRepo.findById(id).map(OrderDbModel::toDomainModel).orElse(null)
 
     @Transactional
     override fun save(order: Order): Order = jpaRepo.save(OrderDbModel.fromDomainModel(order)).toDomainModel()

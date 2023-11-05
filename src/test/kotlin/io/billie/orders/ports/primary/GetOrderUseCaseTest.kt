@@ -37,13 +37,13 @@ class GetOrderUseCaseTest {
     fun shouldGetEmptyOrderFromRepository() {
         //given
         val id = UUID.randomUUID()
-        Mockito.`when`(orderRepository.find(id)).thenReturn(Optional.empty())
+        Mockito.`when`(orderRepository.find(id)).thenReturn(null)
 
         //when
         val order = testee.getOrder(GetOrderUseCase.Input(id))
 
         //then
-        assertThat(order).isNotPresent
+        assertThat(order).isNull()
     }
 
     @Test
@@ -51,13 +51,13 @@ class GetOrderUseCaseTest {
         //given
         val orderId = UUID.randomUUID()
         val order = Order(orderId, 2, LocalDateTime.now(), Order.OrderStatus.SHIPPED, BigDecimal.TEN, BigDecimal.TEN, UUID.randomUUID())
-        Mockito.`when`(orderRepository.find(orderId)).thenReturn(Optional.of(order))
+        Mockito.`when`(orderRepository.find(orderId)).thenReturn(order)
 
         //when
         val result = testee.getOrder(GetOrderUseCase.Input(orderId))
 
         //then
-        assertThat(result).isPresent
-        assertThat(result.get()).isEqualTo(order)
+        assertThat(result).isNotNull
+        assertThat(result).isEqualTo(order)
     }
 }

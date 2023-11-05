@@ -71,8 +71,8 @@ class CreateAndReadOrdersIT {
         val response = mapper.readValue(result.response.contentAsString, OrdersRestApi.OrderResponse::class.java)
 
         val orderFromDb = orderRepository.find(response.id)
-        assertThat(orderFromDb).isPresent
-        assertThat(response).isEqualTo(OrdersRestApi.OrderResponse.fromDomainModel(orderFromDb.get()))
+        assertThat(orderFromDb).isNotNull
+        assertThat(response).isEqualTo(OrdersRestApi.OrderResponse.fromDomainModel(orderFromDb!!))
     }
 
 }

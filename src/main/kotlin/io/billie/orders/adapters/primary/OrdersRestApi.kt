@@ -2,15 +2,11 @@ package io.billie.orders.adapters.primary
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.billie.orders.domain.Order
+import io.billie.orders.domain.OrderShipmentException
 import io.billie.orders.domain.OrderValidationException
 import io.billie.orders.ports.primary.CreateOrderUseCase
 import io.billie.orders.ports.primary.GetOrderUseCase
 import io.billie.orders.ports.primary.ShipmentNotificationUseCase
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -32,6 +28,10 @@ class OrdersRestApi(
     data class CreateOrderRequest(
             @field:NotNull @JsonProperty("order_amount") val orderAmount: BigDecimal,
             @field:NotBlank @JsonProperty("merchant_id") val merchantId: String,
+    )
+
+    data class ShipmentNotificationRequest(
+            @field:NotNull @JsonProperty("shipment_amount_notification") val shipmentAmountNotification: BigDecimal,
     )
 
     data class OrderResponse(
@@ -60,9 +60,8 @@ class OrdersRestApi(
 
 
     @GetMapping("/{orderId}")
-    fun findOrder(@PathVariable orderId: String): Optional<OrderResponse> =
-            getOrderUseCase.getOrder(GetOrderUseCase.Input(UUID.fromString(orderId)))
-                    .map(OrderResponse.Companion::fromDomainModel)
+    fun findOrder(@PathVariable orderId: String): OrderResponse? =
+            getOrderUseCase.getOrder(GetOrderUseCase.Input(UUID.fromString(orderId)))?.let { OrderResponse.fromDomainModel(it) }
 
 
     @PostMapping
@@ -76,8 +75,13 @@ class OrdersRestApi(
     }
 
     @PatchMapping("/{orderId}")
-    fun notifyShipmentOfOrder(@PathVariable orderId: String): Optional<OrderResponse> {
-        return TODO("Provide the return value")
+    fun notifyShipmentOfOrder(@PathVariable orderId: String, @Valid @RequestBody request: ShipmentNotificationRequest): OrderResponse {
+        try {
+            val updatedOrder = shipmentNotificationUseCase.notifyShipment(ShipmentNotificationUseCase.Input(UUID.fromString(orderId), request.shipmentAmountNotification))
+            return OrderResponse.fromDomainModel(updatedOrder)
+        } catch (e: OrderShipmentException) {
+            throw ResponseStatusException(BAD_REQUEST, e.message)
+        }
     }
 
 

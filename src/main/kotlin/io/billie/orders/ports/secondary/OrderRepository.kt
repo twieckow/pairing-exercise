@@ -7,7 +7,7 @@ import java.util.*
 interface OrderRepository {
 
     @Transactional(readOnly = true)
-    fun find(id: UUID): Optional<Order>
+    fun find(id: UUID): Order?
 
     @Transactional
     fun save(order: Order): Order

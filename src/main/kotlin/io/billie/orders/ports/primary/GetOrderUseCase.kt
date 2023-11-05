@@ -10,7 +10,7 @@ class GetOrderUseCase(private val orderRepository: OrderRepository) {
 
     data class Input(val orderId: UUID)
 
-    fun getOrder(input: Input): Optional<Order> {
+    fun getOrder(input: Input): Order? {
         return orderRepository.find(input.orderId)
     }
 }
