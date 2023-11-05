@@ -13,7 +13,6 @@ class CreateOrderUseCase(val orderRepository: OrderRepository) {
 
     fun createNewOrder(input: Input): Order {
         val order = Order.initiate(input.orderAmount, input.merchantId)
-        orderRepository.save(order)
-        return order
+        return orderRepository.save(order)
     }
 }

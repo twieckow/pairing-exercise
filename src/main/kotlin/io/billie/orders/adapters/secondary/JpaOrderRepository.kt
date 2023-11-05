@@ -22,7 +22,7 @@ class JpaOrderRepository(private val jpaRepo: JpaOrderRepo) : OrderRepository {
     override fun find(id: UUID): Order? = jpaRepo.findById(id).map(OrderDbModel::toDomainModel).orElse(null)
 
     @Transactional
-    override fun save(order: Order): Order = jpaRepo.save(OrderDbModel.fromDomainModel(order)).toDomainModel()
+    override fun save(order: Order): Order = jpaRepo.saveAndFlush(OrderDbModel.fromDomainModel(order)).toDomainModel()
 }
 
 

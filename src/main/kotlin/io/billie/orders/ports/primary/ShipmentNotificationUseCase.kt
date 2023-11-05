@@ -16,7 +16,6 @@ class ShipmentNotificationUseCase(val orderRepository: OrderRepository) {
         val order = orderRepository.find(input.orderId)
         order ?: throw OrderShipmentException("Cannot find order ${input.orderId}")
         order.notifyShipment(input.shippedAmount)
-        orderRepository.save(order)
-        return order
+        return orderRepository.save(order)
     }
 }
