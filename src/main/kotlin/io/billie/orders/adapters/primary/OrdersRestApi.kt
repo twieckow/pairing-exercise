@@ -18,13 +18,14 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
 
 @RestController
 @RequestMapping("orders")
 class OrdersRestApi(val createOrderUseCase: CreateOrderUseCase, val getOrderUseCase: GetOrderUseCase) {
 
     data class CreateOrderRequest(
-            @field:NotBlank @JsonProperty("order_amount") val orderAmount: BigDecimal,
+            @field:NotNull @JsonProperty("order_amount") val orderAmount: BigDecimal,
             @field:NotBlank @JsonProperty("merchant_id") val merchantId: String,
     )
 
@@ -44,8 +45,8 @@ class OrdersRestApi(val createOrderUseCase: CreateOrderUseCase, val getOrderUseC
                         version = order.version,
                         createdDatetime = order.createdDatetime,
                         orderStatus = order.orderStatus.name,
-                        orderAmount = order.orderAmount,
-                        shippedAmount = order.shippedAmount,
+                        orderAmount = order.orderAmount.stripTrailingZeros(),
+                        shippedAmount = order.shippedAmount.stripTrailingZeros(),
                         merchantId = order.merchantId)
             }
         }

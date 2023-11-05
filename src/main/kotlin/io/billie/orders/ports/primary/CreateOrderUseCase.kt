@@ -1,7 +1,7 @@
 package io.billie.orders.ports.primary
 
-import io.billie.orders.ports.secondary.OrderRepository
 import io.billie.orders.domain.Order
+import io.billie.orders.ports.secondary.OrderRepository
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.util.*
@@ -13,6 +13,7 @@ class CreateOrderUseCase(val orderRepository: OrderRepository) {
 
     fun createNewOrder(input: Input): Order {
         val order = Order.initiate(input.orderAmount, input.merchantId)
-        return orderRepository.save(order)
+        orderRepository.save(order)
+        return order
     }
 }
