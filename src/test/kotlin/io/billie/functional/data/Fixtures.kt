@@ -1,9 +1,6 @@
 package io.billie.functional.data
 
-import io.billie.orders.domain.Order
-import java.math.BigDecimal
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.*
 
 object Fixtures {
@@ -148,29 +145,5 @@ object Fixtures {
         data["email"] = "yourquestions@bbc.co.uk"
         return data
     }
-
-
-    fun orderCreationRequestJsonOrderAmountMissing(): String {
-        return "{\n" +
-                "  \"merchant_id\": \"${orderFixture.merchantId}\"\n" +
-                "}"
-    }
-
-    fun orderCreationRequestJson(): String {
-        return "{\n" +
-                "  \"order_amount\": ${orderFixture.orderAmount},\n" +
-                "  \"merchant_id\": \"${orderFixture.merchantId}\"\n" +
-                "}"
-    }
-
-    val orderFixture: Order = Order(
-            UUID.randomUUID(),
-            3,
-            LocalDateTime.now(),
-            Order.OrderStatus.SHIPPED_PARTIALLY,
-            BigDecimal.valueOf(123),
-            BigDecimal.TEN,
-            UUID.randomUUID()
-    )
 
 }

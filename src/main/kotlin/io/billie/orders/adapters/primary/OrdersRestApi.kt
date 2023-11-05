@@ -1,10 +1,11 @@
 package io.billie.orders.adapters.primary
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.billie.orders.domain.OrderValidationException
 import io.billie.orders.domain.Order
+import io.billie.orders.domain.OrderValidationException
 import io.billie.orders.ports.primary.CreateOrderUseCase
 import io.billie.orders.ports.primary.GetOrderUseCase
+import io.billie.orders.ports.primary.ShipmentNotificationUseCase
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -22,7 +23,11 @@ import javax.validation.constraints.NotNull
 
 @RestController
 @RequestMapping("orders")
-class OrdersRestApi(val createOrderUseCase: CreateOrderUseCase, val getOrderUseCase: GetOrderUseCase) {
+class OrdersRestApi(
+        val createOrderUseCase: CreateOrderUseCase,
+        val getOrderUseCase: GetOrderUseCase,
+        val shipmentNotificationUseCase: ShipmentNotificationUseCase,
+) {
 
     data class CreateOrderRequest(
             @field:NotNull @JsonProperty("order_amount") val orderAmount: BigDecimal,
@@ -54,26 +59,13 @@ class OrdersRestApi(val createOrderUseCase: CreateOrderUseCase, val getOrderUseC
     }
 
 
-    @GetMapping("/{id}")
-    fun findOrder(@PathVariable id: String): Optional<OrderResponse> =
-            getOrderUseCase.getOrder(GetOrderUseCase.Input(UUID.fromString(id)))
+    @GetMapping("/{orderId}")
+    fun findOrder(@PathVariable orderId: String): Optional<OrderResponse> =
+            getOrderUseCase.getOrder(GetOrderUseCase.Input(UUID.fromString(orderId)))
                     .map(OrderResponse.Companion::fromDomainModel)
 
 
     @PostMapping
-    @ApiResponses(
-            value = [
-                ApiResponse(
-                        responseCode = "200",
-                        description = "Accepted the new order",
-                        content = [
-                            (Content(
-                                    mediaType = "application/json",
-                                    array = (ArraySchema(schema = Schema(implementation = OrderResponse::class)))
-                            ))]
-                ),
-                ApiResponse(responseCode = "400", description = "Bad request", content = [Content()])]
-    )
     fun createOrder(@Valid @RequestBody request: CreateOrderRequest): OrderResponse {
         try {
             val order = createOrderUseCase.createNewOrder(CreateOrderUseCase.Input(request.orderAmount, UUID.fromString(request.merchantId)))
@@ -82,5 +74,11 @@ class OrdersRestApi(val createOrderUseCase: CreateOrderUseCase, val getOrderUseC
             throw ResponseStatusException(BAD_REQUEST, e.message)
         }
     }
+
+    @PatchMapping("/{orderId}")
+    fun notifyShipmentOfOrder(@PathVariable orderId: String): Optional<OrderResponse> {
+        return TODO("Provide the return value")
+    }
+
 
 }
