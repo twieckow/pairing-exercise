@@ -67,7 +67,7 @@ class OrdersRestApi(
     @PostMapping
     fun createOrder(@Valid @RequestBody request: CreateOrderRequest): OrderResponse {
         try {
-            val order = createOrderUseCase.createNewOrder(CreateOrderUseCase.Input(request.orderAmount, UUID.fromString(request.merchantId)))
+            val order = createOrderUseCase.execute(CreateOrderUseCase.Input(request.orderAmount, UUID.fromString(request.merchantId)))
             return OrderResponse.fromDomainModel(order)
         } catch (e: OrderValidationException) {
             throw ResponseStatusException(BAD_REQUEST, e.message)
@@ -77,7 +77,7 @@ class OrdersRestApi(
     @PatchMapping("/{orderId}")
     fun notifyShipmentOfOrder(@PathVariable orderId: String, @Valid @RequestBody request: ShipmentNotificationRequest): OrderResponse {
         try {
-            val updatedOrder = shipmentNotificationUseCase.notifyShipment(ShipmentNotificationUseCase.Input(UUID.fromString(orderId), request.shipmentAmountNotification))
+            val updatedOrder = shipmentNotificationUseCase.execute(ShipmentNotificationUseCase.Input(UUID.fromString(orderId), request.shipmentAmountNotification))
             return OrderResponse.fromDomainModel(updatedOrder)
         } catch (e: OrderShipmentException) {
             throw ResponseStatusException(BAD_REQUEST, e.message)
